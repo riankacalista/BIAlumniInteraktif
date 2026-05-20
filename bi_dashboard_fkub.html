@@ -1,0 +1,405 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.db-wrap{width:100%;padding:0 0 2rem}
+.db-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:1.25rem}
+.db-title{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.db-subtitle{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.db-badges{display:flex;gap:8px;align-items:center}
+.badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500}
+.badge-live{background:#EAF3DE;color:#3B6D11}
+.badge-date{background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary)}
+.section-label{font-size:11px;font-weight:500;color:var(--color-text-secondary);letter-spacing:.05em;text-transform:uppercase;padding:0 1.25rem;margin-bottom:.6rem;margin-top:1.25rem}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0 1.25rem}
+.kpi-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.85rem 1rem}
+.kpi-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:4px}
+.kpi-val{font-size:22px;font-weight:500;color:var(--color-text-primary);line-height:1}
+.kpi-sub{font-size:11px;margin-top:4px;display:flex;align-items:center;gap:4px}
+.kpi-up{color:#3B6D11}.kpi-down{color:#A32D2D}.kpi-neu{color:var(--color-text-secondary)}
+.tl{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.tl-green{background:#3B6D11}.tl-yellow{background:#BA7517}.tl-red{background:#A32D2D}
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 1.25rem;margin-top:.5rem}
+.chart-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem}
+.chart-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:.25rem}
+.chart-desc{font-size:11px;color:var(--color-text-secondary);margin-bottom:.85rem}
+.chart-full{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin:0 1.25rem;margin-top:12px}
+.legend-row{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:8px;font-size:11px;color:var(--color-text-secondary)}
+.leg-dot{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:middle}
+.skills-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 1.25rem;margin-top:12px}
+.skills-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem}
+.skills-item{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.skills-name{font-size:12px;color:var(--color-text-primary);min-width:120px}
+.skills-bar-wrap{flex:1;background:var(--color-background-secondary);border-radius:4px;height:8px;overflow:hidden}
+.skills-bar{height:8px;border-radius:4px}
+.skills-pct{font-size:11px;color:var(--color-text-secondary);min-width:30px;text-align:right}
+.geo-placeholder{width:100%;height:180px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.geo-label{font-size:11px;color:var(--color-text-secondary)}
+.dot-map{position:absolute;top:0;left:0;width:100%;height:100%}
+.emp-dot{position:absolute;border-radius:50%;background:rgba(24,95,165,0.55)}
+.tab-nav{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);padding:0 1.25rem;margin-top:1.25rem}
+.tab-btn{font-size:12px;padding:6px 14px;color:var(--color-text-secondary);cursor:pointer;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none}
+.tab-btn.active{color:var(--color-text-primary);font-weight:500;border-bottom:2px solid #185FA5}
+.panel{display:none}.panel.active{display:block}
+.acred-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px}
+.acred-row:last-child{border-bottom:none}
+.acred-item{flex:1;color:var(--color-text-primary)}
+.acred-status{padding:2px 10px;border-radius:12px;font-size:11px;font-weight:500}
+.status-done{background:#EAF3DE;color:#3B6D11}
+.status-prog{background:#FAEEDA;color:#633806}
+.status-pend{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.acred-pct{font-size:12px;font-weight:500;color:var(--color-text-primary);min-width:36px;text-align:right}
+</style>
+
+<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">BI Dashboard Integrated Fakultas Kedokteran Universitas Brawijaya — menampilkan KPI alumni, peta sebaran, analitik employability, skills gap, dan laporan akreditasi</h2>
+
+<div class="db-wrap">
+
+<div class="db-header">
+  <div>
+    <div class="db-title"><i class="ti ti-layout-dashboard" aria-hidden="true" style="font-size:16px;margin-right:6px;vertical-align:-2px"></i>Integrated BI Dashboard — FK UB</div>
+    <div class="db-subtitle">Manajemen Alumni, Tracer Study & Pengembangan Karir · 2026–2030</div>
+  </div>
+  <div class="db-badges">
+    <span class="badge badge-live"><i class="ti ti-circle-filled" aria-hidden="true" style="font-size:8px;margin-right:4px;vertical-align:1px"></i>Live</span>
+    <span class="badge badge-date"><i class="ti ti-calendar" aria-hidden="true" style="font-size:12px;margin-right:3px;vertical-align:-1px"></i>Mei 2026</span>
+    <span class="badge badge-date"><i class="ti ti-user" aria-hidden="true" style="font-size:12px;margin-right:3px;vertical-align:-1px"></i>Dekan FK UB</span>
+  </div>
+</div>
+
+<div class="section-label">Panel eksekutif — KPI utama</div>
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-label"><span class="tl tl-yellow"></span>Response rate tracer</div>
+    <div class="kpi-val">62%</div>
+    <div class="kpi-sub kpi-up"><i class="ti ti-trending-up" aria-hidden="true"></i>+27% vs baseline · target 80%</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label"><span class="tl tl-green"></span>Alumni terdaftar portal</div>
+    <div class="kpi-val">2.840</div>
+    <div class="kpi-sub kpi-up"><i class="ti ti-trending-up" aria-hidden="true"></i>+1.340 dari tahun lalu</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label"><span class="tl tl-green"></span>Kerja ≤3 bln pasca wisuda</div>
+    <div class="kpi-val">71%</div>
+    <div class="kpi-sub kpi-up"><i class="ti ti-trending-up" aria-hidden="true"></i>+18% · target 75%</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label"><span class="tl tl-green"></span>Uptime sistem</div>
+    <div class="kpi-val">99.3%</div>
+    <div class="kpi-sub kpi-neu"><i class="ti ti-minus" aria-hidden="true"></i>SLA ≥99% · terpenuhi</div>
+  </div>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab(this,'t1')">Sebaran alumni</button>
+  <button class="tab-btn" onclick="switchTab(this,'t2')">Employability</button>
+  <button class="tab-btn" onclick="switchTab(this,'t3')">Skills gap</button>
+  <button class="tab-btn" onclick="switchTab(this,'t4')">Akreditasi</button>
+</div>
+
+<div id="t1" class="panel active">
+  <div class="section-label" style="margin-top:1rem">Peta geospasial — sebaran lokasi kerja alumni</div>
+  <div class="chart-full">
+    <div class="chart-title">Sebaran alumni berdasarkan lokasi kerja</div>
+    <div class="chart-desc">Data tracer study 2024–2026 · filter: semua angkatan, semua prodi</div>
+    <div class="geo-placeholder" id="geoMap">
+      <svg class="dot-map" viewBox="0 0 560 180" xmlns="http://www.w3.org/2000/svg" aria-label="Peta Indonesia dengan titik sebaran alumni"></svg>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:12px">
+      <div style="flex:1;min-width:120px">
+        <div class="legend-row">
+          <span><span class="leg-dot" style="background:#185FA5"></span>Jawa Timur — 38%</span>
+          <span><span class="leg-dot" style="background:#3B6D11"></span>Jawa Tengah — 14%</span>
+          <span><span class="leg-dot" style="background:#BA7517"></span>DKI Jakarta — 18%</span>
+          <span><span class="leg-dot" style="background:#993556"></span>Kalimantan — 8%</span>
+          <span><span class="leg-dot" style="background:#533AB7"></span>Sulawesi — 7%</span>
+          <span><span class="leg-dot" style="background:#888780"></span>Lainnya — 15%</span>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:var(--color-text-secondary)">Total alumni terpetakan</div>
+        <div style="font-size:18px;font-weight:500;color:var(--color-text-primary)">2.184</div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:0 1.25rem;margin-top:12px">
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.75rem 1rem;font-size:12px;color:var(--color-text-secondary)">
+      <i class="ti ti-info-circle" aria-hidden="true" style="font-size:13px;margin-right:4px;vertical-align:-1px"></i>
+      78% alumni bekerja di Jawa · 22% tersebar di luar Jawa. Rekomendasi: dorong program penempatan tenaga medis di wilayah Kalimantan dan Sulawesi sesuai target Kemenkes.
+    </div>
+  </div>
+</div>
+
+<div id="t2" class="panel">
+  <div class="charts-row" style="margin-top:1rem">
+    <div class="chart-card">
+      <div class="chart-title">Waktu tunggu kerja pertama (bulan)</div>
+      <div class="chart-desc">Per angkatan · lulusan 2021–2025</div>
+      <div class="legend-row">
+        <span><span class="leg-dot" style="background:#185FA5"></span>≤1 bulan</span>
+        <span><span class="leg-dot" style="background:#378ADD;border:1px dashed #185FA5"></span>2–3 bulan</span>
+        <span><span class="leg-dot" style="background:#B5D4F4;outline:2px dotted #378ADD;outline-offset:1px"></span>>3 bulan</span>
+      </div>
+      <div style="position:relative;width:100%;height:160px">
+        <canvas id="c1" role="img" aria-label="Stacked bar chart waktu tunggu kerja alumni per angkatan 2021-2025">Alumni 2021: 42% cepat, 31% sedang, 27% lambat. Alumni 2025: 38% cepat, 33% sedang, 29% lambat.</canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Kesesuaian bidang kerja dengan prodi</div>
+      <div class="chart-desc">Total wisudawan 2021–2025</div>
+      <div class="legend-row">
+        <span><span class="leg-dot" style="background:#3B6D11"></span>Sesuai (76%)</span>
+        <span><span class="leg-dot" style="background:#BA7517;border:1px dashed #3B6D11"></span>Sebagian sesuai (16%)</span>
+        <span><span class="leg-dot" style="background:#A32D2D;outline:2px dotted #BA7517;outline-offset:1px"></span>Tidak sesuai (8%)</span>
+      </div>
+      <div style="position:relative;width:100%;height:160px">
+        <canvas id="c2" role="img" aria-label="Donut chart kesesuaian bidang kerja alumni. 76% sesuai, 16% sebagian sesuai, 8% tidak sesuai">76% sesuai bidang, 16% sebagian, 8% tidak sesuai.</canvas>
+      </div>
+    </div>
+  </div>
+  <div class="chart-full">
+    <div class="chart-title">Jenis fasilitas kesehatan tempat alumni bekerja</div>
+    <div class="chart-desc">Berdasarkan data tracer study 2026</div>
+    <div class="legend-row">
+      <span><span class="leg-dot" style="background:#185FA5"></span>RS Pemerintah</span>
+      <span><span class="leg-dot" style="background:#3B6D11;border:1px dashed #185FA5"></span>RS Swasta</span>
+      <span><span class="leg-dot" style="background:#BA7517;outline:2px dotted #3B6D11;outline-offset:1px"></span>Klinik / Puskesmas</span>
+      <span><span class="leg-dot" style="background:#533AB7;border:2px solid #BA7517"></span>Akademik / Riset</span>
+      <span><span class="leg-dot" style="background:#888780"></span>Lainnya</span>
+    </div>
+    <div style="position:relative;width:100%;height:160px">
+      <canvas id="c3" role="img" aria-label="Horizontal bar chart jenis fasilitas kesehatan. RS Pemerintah 38%, RS Swasta 29%, Klinik 21%, Akademik 8%, Lainnya 4%">RS Pemerintah 38%, RS Swasta 29%, Klinik/Puskesmas 21%, Akademik 8%, Lainnya 4%.</canvas>
+    </div>
+  </div>
+</div>
+
+<div id="t3" class="panel">
+  <div class="skills-grid">
+    <div class="skills-card">
+      <div class="chart-title">Kompetensi paling dibutuhkan employer</div>
+      <div class="chart-desc" style="margin-bottom:.75rem">Berdasarkan analisis 890 lowongan medis aktif</div>
+      <div id="demandSkills"></div>
+    </div>
+    <div class="skills-card">
+      <div class="chart-title">Kompetensi yang dilaporkan alumni "kurang terlatih"</div>
+      <div class="chart-desc" style="margin-bottom:.75rem">Berdasarkan data tracer study 2024–2026</div>
+      <div id="weakSkills"></div>
+    </div>
+  </div>
+  <div class="chart-full">
+    <div class="chart-title">Gap matrix kompetensi per program studi</div>
+    <div class="chart-desc">Skor gap = (kebutuhan employer − kemampuan alumni) · skala 0–100</div>
+    <div style="position:relative;width:100%;height:200px;margin-top:.5rem">
+      <canvas id="c4" role="img" aria-label="Radar chart gap kompetensi per prodi FK UB untuk komunikasi klinis, teknologi kesehatan, riset, manajemen, dan bahasa inggris">Gap kompetensi: komunikasi klinis, teknologi kesehatan digital, riset, manajemen, Bahasa Inggris.</canvas>
+    </div>
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.75rem 1rem;font-size:12px;color:var(--color-text-secondary);margin-top:12px">
+      <i class="ti ti-bulb" aria-hidden="true" style="font-size:13px;margin-right:4px;vertical-align:-1px"></i>
+      Gap terbesar: <strong style="color:var(--color-text-primary)">Teknologi Kesehatan Digital</strong> (gap 41 poin) dan <strong style="color:var(--color-text-primary)">Bahasa Inggris Medis</strong> (gap 35 poin). Rekomendasi: tambahkan modul wajib health informatics dan medical english di kurikulum semester 5–6.
+    </div>
+  </div>
+</div>
+
+<div id="t4" class="panel">
+  <div class="chart-full" style="margin-top:1rem">
+    <div class="chart-title">Status laporan akreditasi LAM-PTKes — Kriteria 9</div>
+    <div class="chart-desc" style="margin-bottom:.85rem">Kelengkapan data luaran dan capaian per program studi · Periode 2025–2026</div>
+    <div id="acredList"></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:1rem">
+      <div class="kpi-card">
+        <div class="kpi-label">Laporan lengkap</div>
+        <div class="kpi-val" style="color:#3B6D11">4 / 7</div>
+        <div class="kpi-sub kpi-neu">prodi</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Dalam proses</div>
+        <div class="kpi-val" style="color:#BA7517">2 / 7</div>
+        <div class="kpi-sub kpi-neu">prodi</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Belum dimulai</div>
+        <div class="kpi-val" style="color:#A32D2D">1 / 7</div>
+        <div class="kpi-sub kpi-neu">prodi</div>
+      </div>
+    </div>
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.75rem 1rem;font-size:12px;color:var(--color-text-secondary);margin-top:12px">
+      <i class="ti ti-file-export" aria-hidden="true" style="font-size:13px;margin-right:4px;vertical-align:-1px"></i>
+      Export laporan PDF siap diunggah ke SAPTO tersedia untuk 4 prodi yang telah lengkap.
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+function switchTab(btn, id) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(id).classList.add('active');
+  if (id === 't2' && !window.chartsBuilt) buildCharts();
+  if (id === 't3' && !window.skillsBuilt) buildSkills();
+  if (id === 't4' && !window.acredBuilt) buildAcred();
+}
+
+function buildCharts() {
+  window.chartsBuilt = true;
+  new Chart(document.getElementById('c1'), {
+    type: 'bar',
+    data: {
+      labels: ['2021','2022','2023','2024','2025'],
+      datasets: [
+        { label: '≤1 bulan', data: [42,45,48,50,38], backgroundColor: '#185FA5', borderWidth:0 },
+        { label: '2–3 bulan', data: [31,30,29,28,33], backgroundColor: '#378ADD', borderWidth:0,
+          borderDash: [4,2] },
+        { label: '>3 bulan', data: [27,25,23,22,29], backgroundColor: '#B5D4F4', borderWidth:0 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { stacked: true, ticks: { font: { size: 11 }, color: '#888' }, grid: { display: false } },
+        y: { stacked: true, ticks: { font: { size: 11 }, color: '#888', callback: v => v + '%' }, grid: { color: 'rgba(0,0,0,0.06)' }, max: 100 }
+      }
+    }
+  });
+  new Chart(document.getElementById('c2'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Sesuai','Sebagian sesuai','Tidak sesuai'],
+      datasets: [{ data: [76,16,8], backgroundColor: ['#3B6D11','#BA7517','#A32D2D'], borderWidth: 2, borderColor: 'var(--color-background-primary)' }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '65%',
+      plugins: { legend: { display: false } }
+    }
+  });
+  new Chart(document.getElementById('c3'), {
+    type: 'bar',
+    data: {
+      labels: ['RS Pemerintah','RS Swasta','Klinik / Puskesmas','Akademik / Riset','Lainnya'],
+      datasets: [{
+        data: [38,29,21,8,4],
+        backgroundColor: ['#185FA5','#3B6D11','#BA7517','#533AB7','#888780'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { font: { size: 11 }, color: '#888', callback: v => v + '%' }, grid: { color: 'rgba(0,0,0,0.06)' }, max: 45 },
+        y: { ticks: { font: { size: 11 }, color: '#888' }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+function buildSkills() {
+  window.skillsBuilt = true;
+  const demand = [
+    { name: 'Komunikasi klinis', pct: 88, color: '#185FA5' },
+    { name: 'Teknologi kesehatan digital', pct: 82, color: '#185FA5' },
+    { name: 'Bahasa Inggris medis', pct: 76, color: '#185FA5' },
+    { name: 'Riset & EBM', pct: 71, color: '#185FA5' },
+    { name: 'Manajemen RS', pct: 65, color: '#185FA5' },
+  ];
+  const weak = [
+    { name: 'Teknologi kesehatan digital', pct: 41, color: '#A32D2D' },
+    { name: 'Bahasa Inggris medis', pct: 41, color: '#A32D2D' },
+    { name: 'Manajemen RS', pct: 55, color: '#BA7517' },
+    { name: 'Riset & EBM', pct: 62, color: '#BA7517' },
+    { name: 'Komunikasi klinis', pct: 73, color: '#3B6D11' },
+  ];
+  function renderBars(id, items) {
+    const el = document.getElementById(id);
+    el.innerHTML = items.map(i => `
+      <div class="skills-item">
+        <div class="skills-name">${i.name}</div>
+        <div class="skills-bar-wrap"><div class="skills-bar" style="width:${i.pct}%;background:${i.color}"></div></div>
+        <div class="skills-pct">${i.pct}%</div>
+      </div>`).join('');
+  }
+  renderBars('demandSkills', demand);
+  renderBars('weakSkills', weak);
+
+  new Chart(document.getElementById('c4'), {
+    type: 'radar',
+    data: {
+      labels: ['Komunikasi\nklinis','Teknologi\nkesehatan','Riset & EBM','Manajemen\nRS','Bahasa\nInggris'],
+      datasets: [
+        { label: 'Kebutuhan employer', data: [88,82,71,65,76], borderColor: '#185FA5', backgroundColor: 'rgba(24,95,165,0.12)', pointBackgroundColor: '#185FA5', borderWidth: 2, pointRadius: 4 },
+        { label: 'Kemampuan alumni', data: [73,41,62,55,41], borderColor: '#BA7517', backgroundColor: 'rgba(186,117,23,0.12)', pointBackgroundColor: '#BA7517', borderWidth: 2, pointRadius: 4, borderDash: [4,3] }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { r: { min: 0, max: 100, ticks: { stepSize: 25, font: { size: 10 }, color: '#888' }, grid: { color: 'rgba(0,0,0,0.08)' }, pointLabels: { font: { size: 11 }, color: '#666' } } }
+    }
+  });
+}
+
+function buildAcred() {
+  window.acredBuilt = true;
+  const prodi = [
+    { name: 'S1 Kedokteran', status: 'Lengkap', pct: 100, cls: 'status-done' },
+    { name: 'Profesi Dokter (Koas)', status: 'Lengkap', pct: 100, cls: 'status-done' },
+    { name: 'S2 Ilmu Biomedik', status: 'Lengkap', pct: 100, cls: 'status-done' },
+    { name: 'Sp. Penyakit Dalam', status: 'Lengkap', pct: 100, cls: 'status-done' },
+    { name: 'Sp. Bedah', status: 'Dalam proses', pct: 72, cls: 'status-prog' },
+    { name: 'Sp. Anak', status: 'Dalam proses', pct: 58, cls: 'status-prog' },
+    { name: 'S3 Ilmu Kedokteran', status: 'Belum dimulai', pct: 0, cls: 'status-pend' },
+  ];
+  const el = document.getElementById('acredList');
+  el.innerHTML = prodi.map(p => `
+    <div class="acred-row">
+      <div class="acred-item">${p.name}</div>
+      <div style="flex:1.2">
+        <div style="background:var(--color-background-secondary);border-radius:4px;height:6px;overflow:hidden">
+          <div style="height:6px;border-radius:4px;background:${p.pct===100?'#3B6D11':p.pct>0?'#BA7517':'#ddd'};width:${p.pct}%"></div>
+        </div>
+      </div>
+      <span class="acred-status ${p.cls}">${p.status}</span>
+      <div class="acred-pct">${p.pct}%</div>
+    </div>`).join('');
+}
+
+(function buildGeo() {
+  const svg = document.querySelector('.dot-map');
+  const islands = [
+    {x:210,y:100,w:120,h:28,label:'Jawa',r:3},
+    {x:70,y:65,w:180,h:60,label:'Sumatera',r:3},
+    {x:320,y:70,w:100,h:90,label:'Kalimantan',r:3},
+    {x:390,y:100,w:90,h:70,label:'Sulawesi',r:3},
+    {x:460,y:110,w:60,h:40,label:'Maluku',r:3},
+    {x:490,y:90,w:55,h:50,label:'Papua',r:3},
+    {x:270,y:118,w:25,h:12,label:'Bali',r:2},
+  ];
+  const fills = ['#D3D1C7','#D3D1C7','#D3D1C7','#D3D1C7','#D3D1C7','#D3D1C7','#D3D1C7'];
+  let landSvg = '';
+  islands.forEach((isl,i) => {
+    landSvg += `<ellipse cx="${isl.x+isl.w/2}" cy="${isl.y+isl.h/2}" rx="${isl.w/2}" ry="${isl.h/2}" fill="${fills[i]}" opacity="0.7" rx="${isl.r}"/>`;
+  });
+  const dots = [
+    {cx:230,cy:110,r:12,fill:'rgba(24,95,165,0.65)',label:'Malang'},
+    {cx:215,cy:105,r:9,fill:'rgba(24,95,165,0.55)',label:'Surabaya'},
+    {cx:235,cy:115,r:7,fill:'rgba(24,95,165,0.45)',label:''},
+    {cx:250,cy:108,r:6,fill:'rgba(24,95,165,0.4)',label:''},
+    {cx:200,cy:112,r:5,fill:'rgba(186,117,23,0.65)',label:'Solo'},
+    {cx:192,cy:108,r:8,fill:'rgba(186,117,23,0.55)',label:''},
+    {cx:165,cy:107,r:10,fill:'rgba(186,117,23,0.45)',label:'Jakarta'},
+    {cx:370,cy:108,r:6,fill:'rgba(153,53,86,0.65)',label:'Makassar'},
+    {cx:355,cy:100,r:5,fill:'rgba(153,53,86,0.5)',label:''},
+    {cx:340,cy:95,r:5,fill:'rgba(83,58,183,0.6)',label:'Balikpapan'},
+    {cx:330,cy:105,r:4,fill:'rgba(83,58,183,0.5)',label:''},
+    {cx:120,cy:80,r:5,fill:'rgba(136,135,128,0.5)',label:'Medan'},
+    {cx:105,cy:90,r:4,fill:'rgba(136,135,128,0.45)',label:''},
+    {cx:140,cy:100,r:5,fill:'rgba(136,135,128,0.45)',label:''},
+  ];
+  let dotsSvg = dots.map(d => `<circle cx="${d.cx}" cy="${d.cy}" r="${d.r}" fill="${d.fill}"/>`).join('');
+  svg.innerHTML = landSvg + dotsSvg;
+})();
+</script>
